@@ -6,7 +6,7 @@ to accounts, assets, and transactions.
 """
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 
 from flask import current_app
@@ -64,8 +64,8 @@ class User(db.Model):
     mfa_secret = db.Column(db.Text)  # Encrypted
 
     # Timestamps
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     last_login = db.Column(db.DateTime)
 
     # Relationships
@@ -154,7 +154,7 @@ class User(db.Model):
 
     def record_login(self):
         """Record the current time as last login."""
-        self.last_login = datetime.utcnow()
+        self.last_login = datetime.now(timezone.utc)
         db.session.commit()
 
     def to_dict(self, include_sensitive: bool = False) -> dict:

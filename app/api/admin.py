@@ -6,7 +6,7 @@ REST endpoints for administrative functions, data sync, and system health.
 
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app import db
 from app.models import User, Account, Asset, RealEstate, Transaction, AgentTask
@@ -25,7 +25,7 @@ def health_check():
     """
     health = {
         'status': 'healthy',
-        'timestamp': datetime.utcnow().isoformat(),
+        'timestamp': datetime.now(timezone.utc).isoformat(),
         'version': '1.0.0',
         'components': {}
     }
@@ -84,7 +84,7 @@ def get_stats():
                 'completed': AgentTask.query.filter_by(status='completed').count(),
                 'failed': AgentTask.query.filter_by(status='failed').count()
             },
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.now(timezone.utc).isoformat()
         }
 
         return jsonify({
@@ -280,7 +280,7 @@ def cleanup_tasks():
         days_old = int(data.get('days_old', 30))
 
         from datetime import timedelta
-        cutoff = datetime.utcnow() - timedelta(days=days_old)
+        cutoff = datetime.now(timezone.utc) - timedelta(days=days_old)
 
         deleted = AgentTask.query.filter(
             AgentTask.created_at < cutoff,
@@ -324,7 +324,7 @@ def get_config():
             'agent_confidence_threshold': current_app.config.get('AGENT_CONFIDENCE_THRESHOLD'),
             'max_agent_processing_time': current_app.config.get('MAX_AGENT_PROCESSING_TIME'),
             'rate_limit_default': current_app.config.get('RATELIMIT_DEFAULT'),
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.now(timezone.utc).isoformat()
         }
 
         return jsonify({

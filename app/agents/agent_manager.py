@@ -6,7 +6,7 @@ and coordinates agent interactions.
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional, Type
 
 from flask import current_app
@@ -298,7 +298,7 @@ class AgentManager:
             'expected_impact': highest_priority.get('expected_impact'),
             'source_agents': sources,
             'consensus_count': len(recommendations),
-            'created_at': datetime.utcnow().isoformat()
+            'created_at': datetime.now(timezone.utc).isoformat()
         }
 
     def get_agent_status(self) -> Dict[str, Any]:

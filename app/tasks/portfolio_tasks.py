@@ -5,7 +5,7 @@ Celery tasks for portfolio calculations, metrics updates, and rebalancing.
 """
 
 from celery import shared_task
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 
 from app import db
@@ -49,7 +49,7 @@ def calculate_portfolio_metrics_task(self, user_id: str):
         return {
             'user_id': user_id,
             'metrics': metrics,
-            'calculated_at': datetime.utcnow().isoformat()
+            'calculated_at': datetime.now(timezone.utc).isoformat()
         }
 
     except Exception as e:
@@ -80,7 +80,7 @@ def calculate_rebalancing_task(self, user_id: str, target_allocation: dict = Non
         return {
             'user_id': user_id,
             'rebalancing_plan': rebalancing_plan,
-            'calculated_at': datetime.utcnow().isoformat()
+            'calculated_at': datetime.now(timezone.utc).isoformat()
         }
 
     except Exception as e:
@@ -132,7 +132,7 @@ def update_portfolio_values_task(self, user_id: str = None):
                             if price_data and 'price' in price_data:
                                 new_value = float(price_data['price']) * float(asset.quantity)
                                 asset.current_value = new_value
-                                asset.last_updated = datetime.utcnow()
+                                asset.last_updated = datetime.now(timezone.utc)
                                 updated_count += 1
                     except Exception as e:
                         errors.append({
@@ -155,7 +155,7 @@ def update_portfolio_values_task(self, user_id: str = None):
         return {
             'updated_count': updated_count,
             'errors': errors,
-            'completed_at': datetime.utcnow().isoformat()
+            'completed_at': datetime.now(timezone.utc).isoformat()
         }
 
     except Exception as e:
@@ -198,7 +198,7 @@ def calculate_risk_metrics_task(user_id: str):
         return {
             'user_id': user_id,
             'risk_metrics': metrics,
-            'calculated_at': datetime.utcnow().isoformat()
+            'calculated_at': datetime.now(timezone.utc).isoformat()
         }
 
     except Exception as e:
@@ -242,7 +242,7 @@ def run_monte_carlo_task(user_id: str, simulations: int = 10000, years: float = 
                 'simulations': simulations,
                 'years': years
             },
-            'calculated_at': datetime.utcnow().isoformat()
+            'calculated_at': datetime.now(timezone.utc).isoformat()
         }
 
     except Exception as e:

@@ -5,7 +5,7 @@ Celery tasks for running AI agent analyses and processing agent queues.
 """
 
 from celery import shared_task
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 
 from app import db
@@ -51,7 +51,7 @@ def run_agent_analysis_task(self, user_id: str, agent_type: str, task_type: str 
             'user_id': user_id,
             'agent_type': agent_type,
             'response': response.to_dict(),
-            'completed_at': datetime.utcnow().isoformat()
+            'completed_at': datetime.now(timezone.utc).isoformat()
         }
 
     except AgentError as e:
@@ -67,7 +67,7 @@ def run_agent_analysis_task(self, user_id: str, agent_type: str, task_type: str 
         if task:
             task.status = 'failed'
             task.error_message = str(e)
-            task.completed_at = datetime.utcnow()
+            task.completed_at = datetime.now(timezone.utc)
             db.session.commit()
 
         raise self.retry(exc=e)
@@ -110,7 +110,7 @@ def run_all_agents_task(self, user_id: str):
             'user_id': user_id,
             'agents_run': list(results.keys()),
             'results': response_data,
-            'completed_at': datetime.utcnow().isoformat()
+            'completed_at': datetime.now(timezone.utc).isoformat()
         }
 
     except Exception as e:
@@ -163,7 +163,7 @@ def process_agent_queue_task():
                 task.output_summary = response.reasoning[:500] if response.reasoning else None
                 task.full_output = response.to_dict()
                 task.confidence_score = response.confidence_score
-                task.completed_at = datetime.utcnow()
+                task.completed_at = datetime.now(timezone.utc)
                 db.session.commit()
 
                 processed.append({
@@ -176,7 +176,7 @@ def process_agent_queue_task():
                 task.status = 'failed'
                 task.error_message = str(e)
                 task.retry_count = (task.retry_count or 0) + 1
-                task.completed_at = datetime.utcnow()
+                task.completed_at = datetime.now(timezone.utc)
                 db.session.commit()
 
                 failed.append({
@@ -191,7 +191,7 @@ def process_agent_queue_task():
         return {
             'processed': processed,
             'failed': failed,
-            'processed_at': datetime.utcnow().isoformat()
+            'processed_at': datetime.now(timezone.utc).isoformat()
         }
 
     except Exception as e:
@@ -233,7 +233,7 @@ def retry_failed_tasks_task():
         return {
             'retried_count': len(retried),
             'task_ids': retried,
-            'retried_at': datetime.utcnow().isoformat()
+            'retried_at': datetime.now(timezone.utc).isoformat()
         }
 
     except Exception as e:
@@ -256,7 +256,7 @@ def cleanup_old_tasks_task(days_old: int = 30):
         logger.info(f"Cleaning up tasks older than {days_old} days")
 
         from datetime import timedelta
-        cutoff = datetime.utcnow() - timedelta(days=days_old)
+        cutoff = datetime.now(timezone.utc) - timedelta(days=days_old)
 
         deleted = AgentTask.query.filter(
             AgentTask.created_at < cutoff,
@@ -270,7 +270,7 @@ def cleanup_old_tasks_task(days_old: int = 30):
         return {
             'deleted_count': deleted,
             'cutoff_date': cutoff.isoformat(),
-            'cleaned_at': datetime.utcnow().isoformat()
+            'cleaned_at': datetime.now(timezone.utc).isoformat()
         }
 
     except Exception as e:
@@ -311,7 +311,7 @@ def get_consolidated_recommendations_task(user_id: str, agent_types: list = None
             'user_id': user_id,
             'recommendations': recommendations,
             'count': len(recommendations),
-            'retrieved_at': datetime.utcnow().isoformat()
+            'retrieved_at': datetime.now(timezone.utc).isoformat()
         }
 
     except Exception as e:
@@ -358,7 +358,7 @@ def schedule_periodic_analysis_task():
 
         return {
             'scheduled_count': len(scheduled),
-            'scheduled_at': datetime.utcnow().isoformat()
+            'scheduled_at': datetime.now(timezone.utc).isoformat()
         }
 
     except Exception as e:

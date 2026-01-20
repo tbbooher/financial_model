@@ -90,7 +90,7 @@ class RealEstateFactory(BaseFactory):
     current_value = factory.LazyAttribute(lambda obj: obj.purchase_price * Decimal(str(round(factory.Faker('pyfloat', min_value=0.9, max_value=1.5).evaluate(None, None, None), 4))))
     monthly_income = factory.LazyFunction(lambda: Decimal(str(round(factory.Faker('pyfloat', min_value=0, max_value=5000).evaluate(None, None, None), 2))))
     monthly_expenses = factory.LazyFunction(lambda: Decimal(str(round(factory.Faker('pyfloat', min_value=200, max_value=1500).evaluate(None, None, None), 2))))
-    purchase_date = factory.LazyFunction(lambda: datetime.utcnow().date() - timedelta(days=factory.Faker('random_int', min=365, max=3650).evaluate(None, None, None)))
+    purchase_date = factory.LazyFunction(lambda: datetime.now(timezone.utc).date() - timedelta(days=factory.Faker('random_int', min=365, max=3650).evaluate(None, None, None)))
 
 
 class TransactionFactory(BaseFactory):

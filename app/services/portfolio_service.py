@@ -5,7 +5,7 @@ Provides portfolio management, calculations, and analysis functionality.
 """
 
 import uuid
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, timezone
 from decimal import Decimal, ROUND_HALF_UP
 from typing import Dict, Any, List, Optional, Tuple
 
@@ -104,7 +104,7 @@ class PortfolioService:
                 'startup_equity': float(total_startup_equity),
                 'personal_property': float(total_personal_property)
             },
-            'last_updated': datetime.utcnow().isoformat()
+            'last_updated': datetime.now(timezone.utc).isoformat()
         }
 
     def _calculate_cash_total(self, user: User) -> Decimal:
@@ -228,7 +228,7 @@ class PortfolioService:
             'total_value': float(total_value),
             'total_cost_basis': float(total_cost),
             'unrealized_gain_loss': float(total_value - total_cost),
-            'calculated_at': datetime.utcnow().isoformat()
+            'calculated_at': datetime.now(timezone.utc).isoformat()
         }
 
     def get_holdings(self, user_id: str = None) -> List[Dict[str, Any]]:
@@ -364,7 +364,7 @@ class PortfolioService:
             'total_portfolio_value': float(total_value),
             'recommended_trades': trades,
             'rebalancing_needed': len(trades) > 0,
-            'calculated_at': datetime.utcnow().isoformat()
+            'calculated_at': datetime.now(timezone.utc).isoformat()
         }
 
     def get_portfolio_data(self, user_id: str = None) -> Dict[str, Any]:

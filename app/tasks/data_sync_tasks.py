@@ -6,7 +6,7 @@ and economic indicators.
 """
 
 from celery import shared_task
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 
 from app import db
@@ -57,7 +57,7 @@ def sync_stock_prices_task(self, symbols: list = None):
                     for asset in assets:
                         new_value = float(price_data['price']) * float(asset.quantity)
                         asset.current_value = new_value
-                        asset.last_updated = datetime.utcnow()
+                        asset.last_updated = datetime.now(timezone.utc)
 
                     results['synced'].append({
                         'symbol': symbol,
@@ -83,7 +83,7 @@ def sync_stock_prices_task(self, symbols: list = None):
 
         return {
             'results': results,
-            'completed_at': datetime.utcnow().isoformat()
+            'completed_at': datetime.now(timezone.utc).isoformat()
         }
 
     except Exception as e:
@@ -114,7 +114,7 @@ def sync_market_data_task(self):
         results = {
             'market_indices': market_data,
             'sector_performance': sector_data,
-            'synced_at': datetime.utcnow().isoformat()
+            'synced_at': datetime.now(timezone.utc).isoformat()
         }
 
         logger.info("Market data synchronization completed")
@@ -143,7 +143,7 @@ def sync_economic_indicators_task(self):
 
         results = {
             'indicators': indicators,
-            'synced_at': datetime.utcnow().isoformat()
+            'synced_at': datetime.now(timezone.utc).isoformat()
         }
 
         logger.info("Economic indicators synchronization completed")
@@ -182,7 +182,7 @@ def sync_historical_data_task(symbol: str, period: str = '2y'):
             'symbol': symbol,
             'period': period,
             'data_points': len(historical_data.get('prices', [])),
-            'synced_at': datetime.utcnow().isoformat()
+            'synced_at': datetime.now(timezone.utc).isoformat()
         }
 
         logger.info(f"Historical data sync completed for {symbol}")
@@ -216,7 +216,7 @@ def sync_all_portfolio_prices_task(user_id: str):
         return {
             'user_id': user_id,
             'results': results,
-            'synced_at': datetime.utcnow().isoformat()
+            'synced_at': datetime.now(timezone.utc).isoformat()
         }
 
     except Exception as e:
@@ -242,7 +242,7 @@ def cleanup_stale_cache_task():
 
         return {
             'status': 'success',
-            'cleaned_at': datetime.utcnow().isoformat()
+            'cleaned_at': datetime.now(timezone.utc).isoformat()
         }
 
     except Exception as e:
@@ -290,7 +290,7 @@ def validate_data_integrity_task():
         results = {
             'status': 'healthy' if not issues else 'issues_found',
             'issues': issues,
-            'validated_at': datetime.utcnow().isoformat()
+            'validated_at': datetime.now(timezone.utc).isoformat()
         }
 
         logger.info(f"Data integrity validation completed. Issues: {len(issues)}")

@@ -6,7 +6,7 @@ their inputs, outputs, and status.
 """
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 
 from sqlalchemy.dialects.postgresql import UUID
@@ -107,13 +107,13 @@ class AgentTask(db.Model):
     def start(self):
         """Mark task as started."""
         self.status = 'processing'
-        self.started_at = datetime.utcnow()
+        self.started_at = datetime.now(timezone.utc)
 
     def complete(self, output_data: dict = None, recommendations: list = None,
                  confidence_score: float = None, reasoning: str = None):
         """Mark task as completed with results."""
         self.status = 'completed'
-        self.completed_at = datetime.utcnow()
+        self.completed_at = datetime.now(timezone.utc)
 
         if output_data:
             self.output_data = output_data
@@ -132,7 +132,7 @@ class AgentTask(db.Model):
         """Mark task as failed."""
         self.status = 'failed'
         self.error_message = error_message
-        self.completed_at = datetime.utcnow()
+        self.completed_at = datetime.now(timezone.utc)
 
         if self.started_at:
             delta = self.completed_at - self.started_at
@@ -155,7 +155,7 @@ class AgentTask(db.Model):
         """Cancel the task."""
         if self.status not in ['completed', 'failed']:
             self.status = 'cancelled'
-            self.completed_at = datetime.utcnow()
+            self.completed_at = datetime.now(timezone.utc)
 
     @classmethod
     def create_task(cls, user_id, agent_type: str, task_type: str,

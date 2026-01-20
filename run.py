@@ -52,7 +52,7 @@ def create_seed_data():
     """Create initial seed data for development"""
     from app.services.auth_service import AuthService
     from decimal import Decimal
-    from datetime import datetime, date
+    from datetime import datetime, date, timezone
     
     # Create test user if not exists
     if not User.query.filter_by(email='demo@familyoffice.com').first():
@@ -104,7 +104,7 @@ def create_seed_data():
             account = Account(
                 user_id=user.id,
                 **account_data,
-                last_synced=datetime.utcnow(),
+                last_synced=datetime.now(timezone.utc),
                 is_active=True
             )
             db.session.add(account)
@@ -149,7 +149,7 @@ def create_seed_data():
             asset = Asset(
                 user_id=user.id,
                 **asset_data,
-                last_updated=datetime.utcnow()
+                last_updated=datetime.now(timezone.utc)
             )
             db.session.add(asset)
         
@@ -200,7 +200,7 @@ def health_check():
     """Health check endpoint for monitoring"""
     return {
         'status': 'healthy',
-        'timestamp': datetime.utcnow().isoformat(),
+        'timestamp': datetime.now(timezone.utc).isoformat(),
         'version': '1.0.0'
     }
 

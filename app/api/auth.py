@@ -4,7 +4,7 @@ Family Office Platform - Authentication API
 REST endpoints for user authentication, registration, and token management.
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import (
     jwt_required, get_jwt_identity, get_jwt,
     create_access_token, create_refresh_token
@@ -136,9 +136,12 @@ def login():
             'message': str(e)
         }), 401
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({
             'status': 'error',
-            'message': 'Login failed'
+            'message': 'Login failed',
+            'debug': str(e) if current_app.debug else None
         }), 500
 
 

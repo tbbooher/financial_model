@@ -6,7 +6,7 @@ including trades, deposits, withdrawals, and dividends.
 """
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 
 from sqlalchemy.dialects.postgresql import UUID
@@ -124,7 +124,7 @@ class Transaction(db.Model):
             price=price,
             total_amount=total,
             fees=fees or Decimal('0.00'),
-            transaction_date=kwargs.get('transaction_date', datetime.utcnow()),
+            transaction_date=kwargs.get('transaction_date', datetime.now(timezone.utc)),
             **{k: v for k, v in kwargs.items() if k != 'transaction_date'}
         )
 
@@ -145,7 +145,7 @@ class Transaction(db.Model):
             cost_basis=cost_basis,
             realized_gain_loss=realized_gain,
             fees=fees or Decimal('0.00'),
-            transaction_date=kwargs.get('transaction_date', datetime.utcnow()),
+            transaction_date=kwargs.get('transaction_date', datetime.now(timezone.utc)),
             **{k: v for k, v in kwargs.items() if k != 'transaction_date'}
         )
 
@@ -158,7 +158,7 @@ class Transaction(db.Model):
             transaction_type='dividend',
             symbol=symbol.upper() if symbol else None,
             total_amount=amount,
-            transaction_date=kwargs.get('transaction_date', datetime.utcnow()),
+            transaction_date=kwargs.get('transaction_date', datetime.now(timezone.utc)),
             **{k: v for k, v in kwargs.items() if k != 'transaction_date'}
         )
 

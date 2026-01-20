@@ -6,7 +6,7 @@ and portfolio synchronization.
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from typing import Dict, Any, List, Optional
 
@@ -80,7 +80,7 @@ class DataService:
                 'industry': info.get('industry'),
                 'currency': info.get('currency', 'USD'),
                 'exchange': info.get('exchange'),
-                'last_updated': datetime.utcnow().isoformat()
+                'last_updated': datetime.now(timezone.utc).isoformat()
             }
 
             # Calculate daily change
@@ -184,7 +184,7 @@ class DataService:
 
         market_data = {
             'indices': [],
-            'last_updated': datetime.utcnow().isoformat()
+            'last_updated': datetime.now(timezone.utc).isoformat()
         }
 
         for symbol, name in indices.items():
@@ -223,7 +223,7 @@ class DataService:
             'failed': 0,
             'skipped': 0,
             'assets': [],
-            'sync_time': datetime.utcnow().isoformat()
+            'sync_time': datetime.now(timezone.utc).isoformat()
         }
 
         for asset in user.assets:
@@ -239,7 +239,7 @@ class DataService:
                 old_value = asset.current_value
                 asset.current_price = new_price
                 asset.current_value = asset.quantity * new_price
-                asset.last_updated = datetime.utcnow()
+                asset.last_updated = datetime.now(timezone.utc)
 
                 results['updated'] += 1
                 results['assets'].append({
@@ -304,7 +304,7 @@ class DataService:
             'sectors': sectors,
             'best_performer': sectors[0] if sectors else None,
             'worst_performer': sectors[-1] if sectors else None,
-            'last_updated': datetime.utcnow().isoformat()
+            'last_updated': datetime.now(timezone.utc).isoformat()
         }
 
     def get_economic_indicators(self) -> Dict[str, Any]:
@@ -345,7 +345,7 @@ class DataService:
 
         return {
             'indicators': indicators,
-            'last_updated': datetime.utcnow().isoformat()
+            'last_updated': datetime.now(timezone.utc).isoformat()
         }
 
     def _is_cached(self, key: str) -> bool:
@@ -354,12 +354,12 @@ class DataService:
             return False
         if key not in self._cache_expiry:
             return False
-        return datetime.utcnow() < self._cache_expiry[key]
+        return datetime.now(timezone.utc) < self._cache_expiry[key]
 
     def _set_cache(self, key: str, data: Any):
         """Set cache with expiry."""
         self._cache[key] = data
-        self._cache_expiry[key] = datetime.utcnow() + self._cache_duration
+        self._cache_expiry[key] = datetime.now(timezone.utc) + self._cache_duration
 
     def clear_cache(self):
         """Clear all cached data."""

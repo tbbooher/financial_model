@@ -7,7 +7,7 @@ and Monte Carlo simulations.
 
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.services.portfolio_service import PortfolioService
 from app.services.capm_service import CAPMService
@@ -46,7 +46,7 @@ def get_capm_analysis():
             'asset_analysis': capm_service.analyze_asset_pricing(portfolio_data),
             'market_data': capm_service.get_market_data(),
             'risk_free_rate': capm_service.risk_free_rate,
-            'calculated_at': datetime.utcnow().isoformat()
+            'calculated_at': datetime.now(timezone.utc).isoformat()
         }
 
         return jsonify({
@@ -107,7 +107,7 @@ def get_risk_analysis():
                 'confidence_level': confidence,
                 'time_horizon_days': horizon
             },
-            'calculated_at': datetime.utcnow().isoformat()
+            'calculated_at': datetime.now(timezone.utc).isoformat()
         }
 
         return jsonify({

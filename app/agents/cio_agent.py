@@ -5,7 +5,7 @@ Chief Investment Officer agent for strategic portfolio management,
 investment policy, and high-level allocation decisions.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Dict, Any, List
 
@@ -267,7 +267,7 @@ class CIOAgent(BaseAgent):
                 'Tax efficiency prioritized'
             ],
             'review_frequency': 'Annual',
-            'last_reviewed': datetime.utcnow().isoformat()
+            'last_reviewed': datetime.now(timezone.utc).isoformat()
         }
 
     def _assess_market_outlook(self) -> Dict[str, Any]:
@@ -305,7 +305,7 @@ class CIOAgent(BaseAgent):
                 'Value stocks',
                 'Real assets for inflation hedge'
             ],
-            'assessment_date': datetime.utcnow().isoformat()
+            'assessment_date': datetime.now(timezone.utc).isoformat()
         }
 
     def _evaluate_performance(self) -> Dict[str, Any]:

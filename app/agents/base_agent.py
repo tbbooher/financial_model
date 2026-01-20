@@ -6,7 +6,7 @@ Provides the abstract base class for all AI agents with common functionality.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 import logging
 
@@ -30,7 +30,7 @@ class AgentResponse:
     confidence_score: float
     reasoning: str
     data_sources: List[str]
-    timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
+    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -215,7 +215,7 @@ class BaseAgent(ABC):
             'details': details or {},
             'expected_impact': expected_impact,
             'agent': self.agent_type,
-            'created_at': datetime.utcnow().isoformat()
+            'created_at': datetime.now(timezone.utc).isoformat()
         }
 
     def _get_portfolio_value(self) -> float:

@@ -6,7 +6,7 @@ REST endpoints for portfolio management, holdings, and performance.
 
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.services.portfolio_service import PortfolioService
 from app.utils.exceptions import ValidationError, CalculationError
@@ -35,7 +35,7 @@ def get_portfolio_summary():
             'status': 'success',
             'data': summary,
             'formatted': formatted,
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.now(timezone.utc).isoformat()
         }), 200
 
     except ValidationError as e:

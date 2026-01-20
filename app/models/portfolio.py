@@ -5,7 +5,7 @@ Defines models for financial accounts, assets, and real estate holdings.
 """
 
 import uuid
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from decimal import Decimal
 
 from sqlalchemy.dialects.postgresql import UUID
@@ -53,8 +53,8 @@ class Account(db.Model):
     is_active = db.Column(db.Boolean, default=True)
 
     # Timestamps
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Relationships - explicitly specify foreign_keys since Transaction has both account_id and related_account_id
     transactions = db.relationship(
@@ -144,8 +144,8 @@ class Asset(db.Model):
 
     # Timestamps
     purchase_date = db.Column(db.Date)
-    last_updated = db.Column(db.DateTime, default=datetime.utcnow)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_updated = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     @property
     def unrealized_gain_loss(self) -> Decimal:
@@ -172,7 +172,7 @@ class Asset(db.Model):
         """Update current value based on price."""
         self.current_price = price
         self.current_value = self.quantity * price
-        self.last_updated = datetime.utcnow()
+        self.last_updated = datetime.now(timezone.utc)
 
     def to_dict(self) -> dict:
         """Convert to dictionary."""
@@ -257,8 +257,8 @@ class RealEstate(db.Model):
     last_valuation_date = db.Column(db.Date)
 
     # Timestamps
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     @property
     def equity(self) -> Decimal:

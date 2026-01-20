@@ -6,7 +6,7 @@ structured data presentation.
 """
 
 from decimal import Decimal, ROUND_HALF_UP
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from typing import Any, Dict, List, Optional, Union
 
 
@@ -173,11 +173,11 @@ def format_date(
         dt = value
         d = value.date()
     else:
-        dt = datetime.combine(value, datetime.min.time())
+        dt = datetime.combine(value, datetime.min.time(), tzinfo=timezone.utc)
         d = value
 
     if relative:
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         if isinstance(value, date) and not isinstance(value, datetime):
             now = now.date()
             diff = now - d

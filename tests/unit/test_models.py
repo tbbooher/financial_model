@@ -6,7 +6,7 @@ Tests for database models and their methods.
 
 import pytest
 from decimal import Decimal
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.models import User, Account, Asset, RealEstate, Transaction, AgentTask
 
@@ -275,7 +275,7 @@ class TestAgentTaskModel:
         # Complete task
         task.status = 'completed'
         task.confidence_score = Decimal('0.85')
-        task.completed_at = datetime.utcnow()
+        task.completed_at = datetime.now(timezone.utc)
         db_session.commit()
 
         assert task.status == 'completed'
