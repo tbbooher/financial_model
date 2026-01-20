@@ -4,10 +4,11 @@ Family Office Platform - Authentication API
 REST endpoints for user authentication, registration, and token management.
 """
 
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, make_response
 from flask_jwt_extended import (
     jwt_required, get_jwt_identity, get_jwt,
-    create_access_token, create_refresh_token
+    create_access_token, create_refresh_token,
+    set_access_cookies, set_refresh_cookies, unset_jwt_cookies
 )
 from datetime import datetime
 
@@ -62,14 +63,21 @@ def register():
 
         tokens = auth_service.generate_tokens(user)
 
-        return jsonify({
+        # Create response with JWT cookies for web auth
+        response = make_response(jsonify({
             'status': 'success',
             'message': 'User registered successfully',
             'data': {
                 'user': user.to_dict(),
                 'tokens': tokens
             }
-        }), 201
+        }), 201)
+
+        # Set JWT cookies for server-side authentication
+        set_access_cookies(response, tokens['access_token'])
+        set_refresh_cookies(response, tokens['refresh_token'])
+
+        return response
 
     except ValidationError as e:
         return jsonify({
@@ -121,14 +129,21 @@ def login():
 
         user, tokens = auth_service.authenticate(email, password)
 
-        return jsonify({
+        # Create response with JWT cookies for web auth
+        response = make_response(jsonify({
             'status': 'success',
             'message': 'Login successful',
             'data': {
                 'user': user.to_dict(),
                 'tokens': tokens
             }
-        }), 200
+        }), 200)
+
+        # Set JWT cookies for server-side authentication
+        set_access_cookies(response, tokens['access_token'])
+        set_refresh_cookies(response, tokens['refresh_token'])
+
+        return response
 
     except AuthenticationError as e:
         return jsonify({
@@ -179,21 +194,25 @@ def refresh():
 
 
 @auth_bp.route('/logout', methods=['POST'])
-@jwt_required()
+@jwt_required(optional=True)
 def logout():
     """
-    Logout user (invalidate token on client side).
+    Logout user (invalidate token on client side and clear cookies).
 
     Note: For full token invalidation, implement token blacklist.
 
     Returns:
         Success message
     """
-    # In production, add token to blacklist
-    return jsonify({
+    # Create response and clear JWT cookies
+    response = make_response(jsonify({
         'status': 'success',
         'message': 'Logout successful'
-    }), 200
+    }), 200)
+
+    unset_jwt_cookies(response)
+
+    return response
 
 
 @auth_bp.route('/me', methods=['GET'])

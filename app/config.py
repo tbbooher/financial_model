@@ -37,6 +37,11 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES', 1)))
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=int(os.environ.get('JWT_REFRESH_TOKEN_EXPIRES', 30)))
     JWT_ALGORITHM = 'HS256'
+    JWT_TOKEN_LOCATION = ['headers', 'cookies']
+    JWT_COOKIE_SECURE = False  # Set to True in production with HTTPS
+    JWT_COOKIE_CSRF_PROTECT = False  # Simplified for development
+    JWT_ACCESS_COOKIE_NAME = 'access_token_cookie'
+    JWT_REFRESH_COOKIE_NAME = 'refresh_token_cookie'
     
     # Security Settings
     BCRYPT_LOG_ROUNDS = int(os.environ.get('BCRYPT_LOG_ROUNDS', 12))

@@ -30,7 +30,10 @@ def get_current_user():
         user_id = get_jwt_identity()
         if user_id:
             from app.models import User
-            return User.query.get(user_id)
+            from app import db
+            import uuid
+            user_uuid = uuid.UUID(user_id) if isinstance(user_id, str) else user_id
+            return db.session.get(User, user_uuid)
     except Exception:
         pass
     return None
@@ -72,11 +75,8 @@ def register():
 
 @main_bp.route('/logout')
 def logout():
-    """Logout user."""
-    # Clear session/cookies
-    session.clear()
-    flash('You have been logged out.', 'info')
-    return redirect(url_for('main.login'))
+    """Logout user - renders page that clears localStorage and cookies."""
+    return render_template('pages/logout.html')
 
 
 # Protected Routes
