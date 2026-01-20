@@ -95,21 +95,24 @@ class Config:
 
 class DevelopmentConfig(Config):
     """Development environment configuration"""
-    
+
     DEBUG = True
     TESTING = False
-    
+
     # Relaxed security for development
     WTF_CSRF_ENABLED = False
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)  # Longer tokens for dev
-    
+
     # Development database
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'postgresql://family_office:password@localhost:5432/family_office_dev'
-    
+
+    # Use parent class engine options for PostgreSQL
+    # (empty dict for SQLite if needed)
+
     # Development logging
     LOG_LEVEL = 'DEBUG'
-    
+
     # Development CORS - allow all origins
     CORS_ORIGINS = ['*']
 
