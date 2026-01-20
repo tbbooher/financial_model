@@ -1,0 +1,444 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}AI Agents - Family Office Platform{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2 class="mb-0">AI Agents</h2>
+        <p class="text-muted">Get insights from specialized financial AI agents</p>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-primary" onclick="runAllAgents()">
+            <i class="bi bi-play-fill me-1"></i>Run All Agents
+        </button>
+    </div>
+</div>
+
+<!-- Agent Cards -->
+<div class="row g-4 mb-4">
+    <!-- CFA Agent -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>CFA Analyst</h5>
+                    <span class="badge bg-light text-primary" id="cfaStatus">Ready</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Investment analysis, portfolio metrics, CAPM evaluation, and security recommendations.</p>
+                <div class="mb-3">
+                    <strong>Specialties:</strong>
+                    <div class="mt-2">
+                        <span class="badge bg-light text-dark me-1">Portfolio Analysis</span>
+                        <span class="badge bg-light text-dark me-1">CAPM</span>
+                        <span class="badge bg-light text-dark">Security Selection</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <button class="btn btn-outline-primary w-100" onclick="runAgent('cfa')">
+                    <i class="bi bi-play me-1"></i>Run Analysis
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CFP Agent -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-success text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-piggy-bank me-2"></i>CFP Planner</h5>
+                    <span class="badge bg-light text-success" id="cfpStatus">Ready</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Financial planning, retirement analysis, estate planning, and tax strategy recommendations.</p>
+                <div class="mb-3">
+                    <strong>Specialties:</strong>
+                    <div class="mt-2">
+                        <span class="badge bg-light text-dark me-1">Retirement</span>
+                        <span class="badge bg-light text-dark me-1">Estate Planning</span>
+                        <span class="badge bg-light text-dark">Tax Strategy</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <button class="btn btn-outline-success w-100" onclick="runAgent('cfp')">
+                    <i class="bi bi-play me-1"></i>Run Analysis
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CIO Agent -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-info text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-briefcase me-2"></i>CIO</h5>
+                    <span class="badge bg-light text-info" id="cioStatus">Ready</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Strategic asset allocation, investment policy, market outlook, and risk oversight.</p>
+                <div class="mb-3">
+                    <strong>Specialties:</strong>
+                    <div class="mt-2">
+                        <span class="badge bg-light text-dark me-1">Strategy</span>
+                        <span class="badge bg-light text-dark me-1">Allocation</span>
+                        <span class="badge bg-light text-dark">Risk Management</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <button class="btn btn-outline-info w-100" onclick="runAgent('cio')">
+                    <i class="bi bi-play me-1"></i>Run Analysis
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accountant Agent -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-warning text-dark">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-calculator me-2"></i>Tax Accountant</h5>
+                    <span class="badge bg-light text-warning" id="accountantStatus">Ready</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Tax loss harvesting, capital gains optimization, quarterly planning, and deduction strategies.</p>
+                <div class="mb-3">
+                    <strong>Specialties:</strong>
+                    <div class="mt-2">
+                        <span class="badge bg-light text-dark me-1">Tax Loss Harvest</span>
+                        <span class="badge bg-light text-dark me-1">Capital Gains</span>
+                        <span class="badge bg-light text-dark">Deductions</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <button class="btn btn-outline-warning w-100" onclick="runAgent('accountant')">
+                    <i class="bi bi-play me-1"></i>Run Analysis
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quant Risk Agent -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-danger text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-shield-exclamation me-2"></i>Risk Quant</h5>
+                    <span class="badge bg-light text-danger" id="quantRiskStatus">Ready</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">VaR modeling, Monte Carlo simulations, stress testing, and tail risk analysis.</p>
+                <div class="mb-3">
+                    <strong>Specialties:</strong>
+                    <div class="mt-2">
+                        <span class="badge bg-light text-dark me-1">VaR</span>
+                        <span class="badge bg-light text-dark me-1">Monte Carlo</span>
+                        <span class="badge bg-light text-dark">Stress Test</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <button class="btn btn-outline-danger w-100" onclick="runAgent('quant_risk')">
+                    <i class="bi bi-play me-1"></i>Run Analysis
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quant Strategy Agent -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-secondary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-cpu me-2"></i>Strategy Quant</h5>
+                    <span class="badge bg-light text-secondary" id="quantStrategyStatus">Ready</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Factor modeling, optimization algorithms, alpha generation, and systematic strategies.</p>
+                <div class="mb-3">
+                    <strong>Specialties:</strong>
+                    <div class="mt-2">
+                        <span class="badge bg-light text-dark me-1">Factor Models</span>
+                        <span class="badge bg-light text-dark me-1">Optimization</span>
+                        <span class="badge bg-light text-dark">Systematic</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <button class="btn btn-outline-secondary w-100" onclick="runAgent('quant_strategy')">
+                    <i class="bi bi-play me-1"></i>Run Analysis
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recommendations Section -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-lightbulb me-2"></i>Consolidated Recommendations</h5>
+        <button class="btn btn-sm btn-outline-primary" onclick="loadRecommendations()">
+            <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+        </button>
+    </div>
+    <div class="card-body" id="recommendationsContainer">
+        <p class="text-muted text-center py-4">Run agents to see recommendations</p>
+    </div>
+</div>
+
+<!-- Task History -->
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-transparent border-0">
+        <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Tasks</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Agent</th>
+                        <th>Task Type</th>
+                        <th>Status</th>
+                        <th>Confidence</th>
+                        <th>Created</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="taskHistoryTable">
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">Loading task history...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Agent Result Modal -->
+<div class="modal fade" id="agentResultModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="agentResultTitle">Agent Analysis</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="agentResultBody">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadTaskHistory();
+    loadRecommendations();
+});
+
+async function runAgent(agentType) {
+    const statusBadge = document.getElementById(`${agentType.replace('_', '')}Status`) ||
+                       document.getElementById(`${agentType}Status`);
+    if (statusBadge) {
+        statusBadge.textContent = 'Running...';
+        statusBadge.classList.add('bg-warning');
+    }
+
+    try {
+        const response = await fetch(`/api/v1/agents/${agentType}/analyze`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            showAgentResult(agentType, data.data);
+            if (statusBadge) {
+                statusBadge.textContent = 'Complete';
+                statusBadge.classList.remove('bg-warning');
+                statusBadge.classList.add('bg-success');
+            }
+            loadTaskHistory();
+            loadRecommendations();
+        } else {
+            throw new Error('Agent analysis failed');
+        }
+    } catch (error) {
+        console.error(`Error running ${agentType} agent:`, error);
+        if (statusBadge) {
+            statusBadge.textContent = 'Error';
+            statusBadge.classList.remove('bg-warning');
+            statusBadge.classList.add('bg-danger');
+        }
+    }
+}
+
+async function runAllAgents() {
+    try {
+        const response = await fetch('/api/v1/agents/analyze-all', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            loadTaskHistory();
+            loadRecommendations();
+        }
+    } catch (error) {
+        console.error('Error running all agents:', error);
+    }
+}
+
+async function loadTaskHistory() {
+    try {
+        const response = await fetch('/api/v1/agents/tasks?limit=10', {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            renderTaskHistory(data.data);
+        }
+    } catch (error) {
+        console.error('Error loading task history:', error);
+    }
+}
+
+async function loadRecommendations() {
+    try {
+        const response = await fetch('/api/v1/agents/recommendations?max=20', {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            renderRecommendations(data.data);
+        }
+    } catch (error) {
+        console.error('Error loading recommendations:', error);
+    }
+}
+
+function renderTaskHistory(tasks) {
+    const table = document.getElementById('taskHistoryTable');
+    if (!tasks || tasks.length === 0) {
+        table.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No tasks found</td></tr>';
+        return;
+    }
+
+    table.innerHTML = tasks.map(task => `
+        <tr>
+            <td><span class="badge bg-secondary">${task.agent_type}</span></td>
+            <td>${task.task_type}</td>
+            <td>
+                <span class="badge ${getStatusClass(task.status)}">${task.status}</span>
+            </td>
+            <td>${task.confidence_score ? (task.confidence_score * 100).toFixed(0) + '%' : '-'}</td>
+            <td>${formatDate(task.created_at)}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary" onclick="viewTask('${task.id}')">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderRecommendations(recommendations) {
+    const container = document.getElementById('recommendationsContainer');
+    if (!recommendations || recommendations.length === 0) {
+        container.innerHTML = '<p class="text-muted text-center py-4">No recommendations available</p>';
+        return;
+    }
+
+    container.innerHTML = recommendations.map(rec => `
+        <div class="d-flex align-items-start mb-3 pb-3 border-bottom">
+            <div class="me-3">
+                <span class="badge ${getPriorityClass(rec.priority)} rounded-pill">${rec.priority}</span>
+            </div>
+            <div class="flex-grow-1">
+                <h6 class="mb-1">${rec.description}</h6>
+                <p class="text-muted mb-1 small">${rec.details || ''}</p>
+                <small class="text-muted">From: ${rec.agent_type} | Impact: ${rec.expected_impact || 'N/A'}</small>
+            </div>
+        </div>
+    `).join('');
+}
+
+function getStatusClass(status) {
+    const classes = {
+        'completed': 'bg-success',
+        'pending': 'bg-warning',
+        'processing': 'bg-info',
+        'failed': 'bg-danger'
+    };
+    return classes[status] || 'bg-secondary';
+}
+
+function getPriorityClass(priority) {
+    const classes = {
+        'critical': 'bg-danger',
+        'high': 'bg-warning',
+        'medium': 'bg-info',
+        'low': 'bg-secondary'
+    };
+    return classes[priority] || 'bg-secondary';
+}
+
+function showAgentResult(agentType, data) {
+    document.getElementById('agentResultTitle').textContent = `${agentType.toUpperCase()} Analysis Results`;
+    document.getElementById('agentResultBody').innerHTML = `
+        <div class="mb-3">
+            <strong>Confidence Score:</strong> ${(data.confidence_score * 100).toFixed(0)}%
+        </div>
+        <div class="mb-3">
+            <strong>Reasoning:</strong>
+            <p>${data.reasoning}</p>
+        </div>
+        <div>
+            <strong>Recommendations:</strong>
+            <ul class="list-group list-group-flush mt-2">
+                ${data.recommendations.map(r => `
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <strong>${r.description}</strong>
+                            <span class="badge ${getPriorityClass(r.priority)}">${r.priority}</span>
+                        </div>
+                        <small class="text-muted">${r.details || ''}</small>
+                    </li>
+                `).join('')}
+            </ul>
+        </div>
+    `;
+    new bootstrap.Modal(document.getElementById('agentResultModal')).show();
+}
+</script>
+{% endblock %}

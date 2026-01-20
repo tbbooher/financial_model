@@ -1,0 +1,386 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Analytics - Family Office Platform{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2 class="mb-0">Analytics</h2>
+        <p class="text-muted">Financial analysis and risk metrics</p>
+    </div>
+</div>
+
+<!-- Analysis Type Tabs -->
+<ul class="nav nav-pills mb-4" role="tablist">
+    <li class="nav-item">
+        <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#capm">
+            <i class="bi bi-graph-up-arrow me-1"></i>CAPM Analysis
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#risk">
+            <i class="bi bi-shield-exclamation me-1"></i>Risk Metrics
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#montecarlo">
+            <i class="bi bi-dice-5 me-1"></i>Monte Carlo
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#stress">
+            <i class="bi bi-exclamation-triangle me-1"></i>Stress Test
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#correlation">
+            <i class="bi bi-grid-3x3 me-1"></i>Correlation
+        </button>
+    </li>
+</ul>
+
+<!-- Tab Content -->
+<div class="tab-content">
+    <!-- CAPM Analysis Tab -->
+    <div class="tab-pane fade show active" id="capm">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-transparent border-0">
+                        <h5 class="mb-0">Portfolio Metrics</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                            <span>Portfolio Beta</span>
+                            <span class="fw-bold" id="capmBeta">-</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                            <span>Expected Return</span>
+                            <span class="fw-bold text-success" id="capmExpectedReturn">-</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                            <span>Risk-Free Rate</span>
+                            <span class="fw-bold" id="capmRiskFree">-</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Market Symbol</span>
+                            <span class="fw-bold" id="capmMarket">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-transparent border-0">
+                        <h5 class="mb-0">Security Market Line</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="smlChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-transparent border-0">
+                        <h5 class="mb-0">Asset Pricing Analysis</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Name</th>
+                                        <th class="text-end">Beta</th>
+                                        <th class="text-end">Expected Return</th>
+                                        <th class="text-end">Actual Return</th>
+                                        <th class="text-end">Alpha</th>
+                                        <th>Valuation</th>
+                                        <th>Recommendation</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="assetPricingTable">
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted py-4">Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Risk Metrics Tab -->
+    <div class="tab-pane fade" id="risk">
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Value at Risk (95%)</h6>
+                        <h2 class="text-danger" id="riskVar95">-</h2>
+                        <small class="text-muted">Daily loss limit</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">CVaR (Expected Shortfall)</h6>
+                        <h2 class="text-danger" id="riskCVar">-</h2>
+                        <small class="text-muted">Worst-case average</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Sharpe Ratio</h6>
+                        <h2 class="text-primary" id="riskSharpe">-</h2>
+                        <small class="text-muted">Risk-adjusted return</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Max Drawdown</h6>
+                        <h2 class="text-warning" id="riskDrawdown">-</h2>
+                        <small class="text-muted">Peak to trough</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-transparent border-0">
+                        <h5 class="mb-0">Risk Distribution</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="riskDistributionChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monte Carlo Tab -->
+    <div class="tab-pane fade" id="montecarlo">
+        <div class="row g-4">
+            <div class="col-lg-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-transparent border-0">
+                        <h5 class="mb-0">Parameters</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Time Horizon (Years)</label>
+                            <input type="number" class="form-control" id="mcYears" value="1" min="0.5" max="10" step="0.5">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Simulations</label>
+                            <select class="form-select" id="mcSimulations">
+                                <option value="1000">1,000</option>
+                                <option value="10000" selected>10,000</option>
+                                <option value="50000">50,000</option>
+                                <option value="100000">100,000</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary w-100" onclick="runMonteCarlo()">
+                            <i class="bi bi-play-fill me-1"></i>Run Simulation
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-header bg-transparent border-0">
+                        <h5 class="mb-0">Results</h5>
+                    </div>
+                    <div class="card-body" id="mcResults">
+                        <p class="text-muted text-center">Run simulation to see results</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-9">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-transparent border-0">
+                        <h5 class="mb-0">Simulation Results</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="monteCarloChart" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stress Test Tab -->
+    <div class="tab-pane fade" id="stress">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Stress Test Scenarios</h5>
+                <button class="btn btn-sm btn-outline-primary" onclick="runStressTest()">
+                    <i class="bi bi-lightning me-1"></i>Run Stress Test
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Scenario</th>
+                                <th>Description</th>
+                                <th class="text-end">Market Impact</th>
+                                <th class="text-end">Portfolio Impact</th>
+                                <th class="text-end">Estimated Loss</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stressTestTable">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">Click "Run Stress Test" to see results</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Correlation Tab -->
+    <div class="tab-pane fade" id="correlation">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-transparent border-0">
+                        <h5 class="mb-0">Correlation Matrix</h5>
+                    </div>
+                    <div class="card-body" id="correlationMatrix">
+                        <p class="text-muted text-center">Loading correlation data...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-transparent border-0">
+                        <h5 class="mb-0">Diversification Score</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="display-1 fw-bold text-primary" id="diversificationScore">-</div>
+                        <p class="text-muted">out of 100</p>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar" role="progressbar" id="diversificationBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadCAPMAnalysis();
+    loadRiskMetrics();
+});
+
+async function loadCAPMAnalysis() {
+    try {
+        const response = await fetch('/api/v1/analytics/capm', {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            renderCAPMAnalysis(data.data);
+        }
+    } catch (error) {
+        console.error('Error loading CAPM analysis:', error);
+    }
+}
+
+async function loadRiskMetrics() {
+    try {
+        const response = await fetch('/api/v1/analytics/risk', {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            renderRiskMetrics(data.data);
+        }
+    } catch (error) {
+        console.error('Error loading risk metrics:', error);
+    }
+}
+
+async function runMonteCarlo() {
+    const years = document.getElementById('mcYears').value;
+    const simulations = document.getElementById('mcSimulations').value;
+
+    try {
+        const response = await fetch(`/api/v1/analytics/monte-carlo?years=${years}&simulations=${simulations}`, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            renderMonteCarloResults(data.data);
+        }
+    } catch (error) {
+        console.error('Error running Monte Carlo:', error);
+    }
+}
+
+async function runStressTest() {
+    try {
+        const response = await fetch('/api/v1/analytics/stress-test', {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            renderStressTestResults(data.data);
+        }
+    } catch (error) {
+        console.error('Error running stress test:', error);
+    }
+}
+
+function renderCAPMAnalysis(data) {
+    document.getElementById('capmBeta').textContent = data.portfolio_beta?.toFixed(4) || '-';
+    document.getElementById('capmExpectedReturn').textContent = formatPercent(data.expected_return);
+    document.getElementById('capmRiskFree').textContent = formatPercent(data.risk_free_rate);
+    document.getElementById('capmMarket').textContent = data.market_data?.symbol || 'S&P 500';
+
+    if (data.security_market_line) {
+        initSMLChart(data.security_market_line, data.asset_analysis);
+    }
+
+    if (data.asset_analysis) {
+        renderAssetPricingTable(data.asset_analysis);
+    }
+}
+
+function renderRiskMetrics(data) {
+    document.getElementById('riskVar95').textContent = formatCurrency(data.var?.dollar_value || 0);
+    document.getElementById('riskCVar').textContent = formatCurrency(data.cvar?.dollar_value || 0);
+    document.getElementById('riskSharpe').textContent = (data.sharpe_ratio || 0).toFixed(2);
+    document.getElementById('riskDrawdown').textContent = formatPercent(data.max_drawdown);
+}
+</script>
+{% endblock %}

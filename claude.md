@@ -21,33 +21,33 @@ This guide provides comprehensive instructions for developing a sophisticated fa
 
 ### Core Framework
 ```python
-# Primary Stack
-Flask==2.3.3              # Web framework
-SQLAlchemy==2.0.21         # ORM for database operations
-Alembic==1.12.0           # Database migrations
-Celery==5.3.2             # Asynchronous task processing
-Redis==4.6.0              # Caching and message broker
-PostgreSQL==14            # Primary database
+# Primary Stack - Use Latest Versions
+Flask                     # Web framework
+SQLAlchemy                # ORM for database operations
+Alembic                   # Database migrations
+Celery                    # Asynchronous task processing
+Redis                     # Caching and message broker
+PostgreSQL                # Primary database (latest stable)
 ```
 
 ### Financial Libraries
 ```python
-# Quantitative Analysis
-numpy==1.24.3             # Numerical computations
-pandas==2.0.3             # Data manipulation
-scipy==1.11.2             # Statistical functions
-scikit-learn==1.3.0       # Machine learning for risk models
-yfinance==0.2.18          # Market data retrieval
-quantlib==1.31            # Quantitative finance library
+# Quantitative Analysis - Use Latest Versions
+numpy                     # Numerical computations
+pandas                    # Data manipulation
+scipy                     # Statistical functions
+scikit-learn              # Machine learning for risk models
+yfinance                  # Market data retrieval
+quantlib                  # Quantitative finance library
 ```
 
 ### Security & Authentication
 ```python
-# Security Stack
-Flask-JWT-Extended==4.5.2  # JWT authentication
-cryptography==41.0.4       # Encryption utilities
-bcrypt==4.0.1             # Password hashing
-python-dotenv==1.0.0      # Environment management
+# Security Stack - Use Latest Versions
+Flask-JWT-Extended        # JWT authentication
+cryptography              # Encryption utilities
+bcrypt                    # Password hashing
+python-dotenv             # Environment management
 ```
 
 ## Project Structure

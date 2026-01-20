@@ -115,17 +115,28 @@ def configure_logging(app):
 
 def register_blueprints(app):
     """Register all application blueprints"""
+    # API blueprints
     from app.api.auth import auth_bp
     from app.api.portfolio import portfolio_bp
     from app.api.agents import agents_bp
     from app.api.analytics import analytics_bp
     from app.api.admin import admin_bp
-    
+
     app.register_blueprint(auth_bp)
     app.register_blueprint(portfolio_bp)
     app.register_blueprint(agents_bp)
     app.register_blueprint(analytics_bp)
     app.register_blueprint(admin_bp)
+
+    # Web routes blueprint
+    from app.routes import main_bp
+    app.register_blueprint(main_bp)
+
+    # Health check endpoint
+    @app.route('/health')
+    def health():
+        from flask import jsonify
+        return jsonify({'status': 'healthy', 'service': 'family-office-platform'}), 200
 
 def register_error_handlers(app):
     """Register custom error handlers"""

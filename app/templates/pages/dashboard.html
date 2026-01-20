@@ -1,0 +1,194 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Dashboard - Family Office Platform{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2 class="mb-0">Dashboard</h2>
+        <p class="text-muted">Welcome back, {{ current_user.first_name or 'User' }}</p>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-primary me-2" onclick="refreshData()">
+            <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+        </button>
+        <button class="btn btn-primary" onclick="runAllAgents()">
+            <i class="bi bi-robot me-1"></i>Run All Agents
+        </button>
+    </div>
+</div>
+
+<!-- Portfolio Summary Cards -->
+<div class="row g-4 mb-4">
+    {% include 'components/portfolio_cards.html' %}
+</div>
+
+<!-- Charts Row -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-4">
+        {% include 'components/charts.html' %}
+    </div>
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Performance History</h5>
+                <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-outline-primary" onclick="updatePerformanceChart('1M')">1M</button>
+                    <button type="button" class="btn btn-outline-primary" onclick="updatePerformanceChart('3M')">3M</button>
+                    <button type="button" class="btn btn-outline-primary active" onclick="updatePerformanceChart('1Y')">1Y</button>
+                    <button type="button" class="btn btn-outline-primary" onclick="updatePerformanceChart('ALL')">ALL</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="performanceChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Holdings and Recommendations Row -->
+<div class="row g-4 mb-4">
+    <!-- Top Holdings -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0"><i class="bi bi-list-ol me-2"></i>Top Holdings</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Asset</th>
+                                <th class="text-end">Value</th>
+                                <th class="text-end">Weight</th>
+                                <th class="text-end">Return</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topHoldingsTable">
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Recommendations -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-lightbulb me-2"></i>AI Recommendations</h5>
+                <a href="{{ url_for('main.agents') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body" id="recommendationsContainer">
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-robot fs-1"></i>
+                    <p class="mt-2">Run agents to get recommendations</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Risk Metrics Row -->
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0"><i class="bi bi-shield me-2"></i>Risk Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Portfolio Beta</span>
+                    <span class="fw-bold" id="portfolioBeta">-</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Sharpe Ratio</span>
+                    <span class="fw-bold" id="sharpeRatio">-</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">VaR (95%)</span>
+                    <span class="fw-bold text-danger" id="var95">-</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted">Max Drawdown</span>
+                    <span class="fw-bold text-danger" id="maxDrawdown">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0"><i class="bi bi-activity me-2"></i>Recent Activity</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush" id="recentActivityList">
+                    <div class="list-group-item text-center text-muted py-4">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadDashboardData();
+});
+
+async function loadDashboardData() {
+    try {
+        const response = await fetch('/api/v1/portfolio/summary', {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            updateDashboard(data.data);
+        }
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+    }
+}
+
+function updateDashboard(data) {
+    document.getElementById('netWorth').textContent = formatCurrency(data.net_worth);
+    document.getElementById('totalAssets').textContent = formatCurrency(data.total_assets);
+    document.getElementById('totalLiabilities').textContent = formatCurrency(data.total_liabilities);
+
+    initAllocationChart(data.breakdown);
+    initPerformanceChart();
+}
+
+function refreshData() {
+    loadDashboardData();
+}
+
+async function runAllAgents() {
+    try {
+        const response = await fetch('/api/v1/agents/analyze-all', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            loadRecommendations();
+        }
+    } catch (error) {
+        console.error('Error running agents:', error);
+    }
+}
+</script>
+{% endblock %}

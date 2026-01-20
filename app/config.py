@@ -110,31 +110,36 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     """Testing environment configuration"""
-    
+
     TESTING = True
     DEBUG = False
-    
-    # In-memory database for testing
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_TEST_URL') or \
-        'postgresql://family_office:password@localhost:5432/family_office_test'
-    
+
+    # In-memory SQLite database for testing (no external DB required)
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_TEST_URL') or 'sqlite:///:memory:'
+
+    # SQLite doesn't need pool settings
+    SQLALCHEMY_ENGINE_OPTIONS = {}
+
     # Disable CSRF for testing
     WTF_CSRF_ENABLED = False
-    
+
     # Fast password hashing for tests
     BCRYPT_LOG_ROUNDS = 4
-    
+
     # Short token expiry for testing
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=1)
-    
-    # Test Redis database
+
+    # Test Redis database (use memory if Redis unavailable)
     REDIS_URL = 'redis://localhost:6379/15'
     CELERY_BROKER_URL = 'redis://localhost:6379/15'
     CELERY_RESULT_BACKEND = 'redis://localhost:6379/15'
-    
+
     # Disable rate limiting in tests
     RATELIMIT_ENABLED = False
+
+    # Set encryption key for testing
+    ENCRYPTION_KEY = 'test-encryption-key-for-testing-only'
 
 class ProductionConfig(Config):
     """Production environment configuration"""

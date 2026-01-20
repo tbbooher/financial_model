@@ -1,0 +1,347 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Portfolio - Family Office Platform{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2 class="mb-0">Portfolio</h2>
+        <p class="text-muted">Manage your assets and holdings</p>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-primary me-2" onclick="syncPrices()">
+            <i class="bi bi-arrow-repeat me-1"></i>Sync Prices
+        </button>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAssetModal">
+            <i class="bi bi-plus-lg me-1"></i>Add Asset
+        </button>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-4 mb-4">
+    {% include 'components/portfolio_cards.html' %}
+</div>
+
+<!-- Asset Type Tabs -->
+<ul class="nav nav-tabs mb-4" id="assetTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">
+            <i class="bi bi-grid me-1"></i>All Assets
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="stocks-tab" data-bs-toggle="tab" data-bs-target="#stocks" type="button" role="tab">
+            <i class="bi bi-graph-up me-1"></i>Stocks
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="bonds-tab" data-bs-toggle="tab" data-bs-target="#bonds" type="button" role="tab">
+            <i class="bi bi-file-text me-1"></i>Bonds
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="realestate-tab" data-bs-toggle="tab" data-bs-target="#realestate" type="button" role="tab">
+            <i class="bi bi-house me-1"></i>Real Estate
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="accounts-tab" data-bs-toggle="tab" data-bs-target="#accounts" type="button" role="tab">
+            <i class="bi bi-bank me-1"></i>Accounts
+        </button>
+    </li>
+</ul>
+
+<!-- Tab Content -->
+<div class="tab-content" id="assetTabContent">
+    <!-- All Assets Tab -->
+    <div class="tab-pane fade show active" id="all" role="tabpanel">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Asset</th>
+                                <th>Type</th>
+                                <th class="text-end">Quantity</th>
+                                <th class="text-end">Cost Basis</th>
+                                <th class="text-end">Current Value</th>
+                                <th class="text-end">Gain/Loss</th>
+                                <th class="text-end">Return</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="allAssetsTable">
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">Loading assets...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stocks Tab -->
+    <div class="tab-pane fade" id="stocks" role="tabpanel">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Name</th>
+                                <th class="text-end">Shares</th>
+                                <th class="text-end">Avg Cost</th>
+                                <th class="text-end">Price</th>
+                                <th class="text-end">Value</th>
+                                <th class="text-end">Return</th>
+                                <th class="text-end">Beta</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stocksTable">
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bonds Tab -->
+    <div class="tab-pane fade" id="bonds" role="tabpanel">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th class="text-end">Face Value</th>
+                                <th class="text-end">Coupon</th>
+                                <th class="text-end">Maturity</th>
+                                <th class="text-end">Current Value</th>
+                                <th class="text-end">Yield</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bondsTable">
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Real Estate Tab -->
+    <div class="tab-pane fade" id="realestate" role="tabpanel">
+        <div class="row g-4" id="realEstateCards">
+            <div class="col-12 text-center text-muted py-4">Loading properties...</div>
+        </div>
+    </div>
+
+    <!-- Accounts Tab -->
+    <div class="tab-pane fade" id="accounts" role="tabpanel">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Account</th>
+                                <th>Institution</th>
+                                <th>Type</th>
+                                <th class="text-end">Balance</th>
+                                <th>Status</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accountsTable">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rebalancing Section -->
+<div class="card border-0 shadow-sm mt-4">
+    <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-sliders me-2"></i>Rebalancing Recommendations</h5>
+        <button class="btn btn-sm btn-outline-primary" onclick="calculateRebalancing()">
+            <i class="bi bi-calculator me-1"></i>Calculate
+        </button>
+    </div>
+    <div class="card-body" id="rebalancingContainer">
+        <p class="text-muted text-center">Click "Calculate" to get rebalancing recommendations</p>
+    </div>
+</div>
+
+<!-- Add Asset Modal -->
+<div class="modal fade" id="addAssetModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add New Asset</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addAssetForm">
+                    <div class="mb-3">
+                        <label class="form-label">Asset Type</label>
+                        <select class="form-select" name="asset_type" required>
+                            <option value="stock">Stock</option>
+                            <option value="etf">ETF</option>
+                            <option value="bond">Bond</option>
+                            <option value="mutual_fund">Mutual Fund</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Symbol</label>
+                        <input type="text" class="form-control" name="symbol" placeholder="e.g., AAPL">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Quantity</label>
+                            <input type="number" class="form-control" name="quantity" step="0.000001" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Cost Basis</label>
+                            <input type="number" class="form-control" name="cost_basis" step="0.01" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="addAsset()">Add Asset</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadPortfolioData();
+});
+
+async function loadPortfolioData() {
+    await Promise.all([
+        loadHoldings(),
+        loadAccounts(),
+        loadRealEstate()
+    ]);
+}
+
+async function loadHoldings() {
+    try {
+        const response = await fetch('/api/v1/portfolio/holdings', {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            renderHoldingsTable(data.data);
+        }
+    } catch (error) {
+        console.error('Error loading holdings:', error);
+    }
+}
+
+function renderHoldingsTable(holdings) {
+    const table = document.getElementById('allAssetsTable');
+    if (!holdings || holdings.length === 0) {
+        table.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">No assets found</td></tr>';
+        return;
+    }
+
+    table.innerHTML = holdings.map(asset => `
+        <tr>
+            <td>
+                <strong>${asset.symbol || '-'}</strong><br>
+                <small class="text-muted">${asset.name}</small>
+            </td>
+            <td><span class="badge bg-secondary">${asset.asset_type}</span></td>
+            <td class="text-end">${formatNumber(asset.quantity)}</td>
+            <td class="text-end">${formatCurrency(asset.cost_basis)}</td>
+            <td class="text-end">${formatCurrency(asset.current_value)}</td>
+            <td class="text-end ${asset.gain_loss >= 0 ? 'text-success' : 'text-danger'}">
+                ${formatCurrency(asset.gain_loss)}
+            </td>
+            <td class="text-end ${asset.return_pct >= 0 ? 'text-success' : 'text-danger'}">
+                ${formatPercent(asset.return_pct)}
+            </td>
+            <td class="text-end">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" onclick="viewAsset('${asset.id}')">View</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="editAsset('${asset.id}')">Edit</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteAsset('${asset.id}')">Delete</a></li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+async function syncPrices() {
+    try {
+        const response = await fetch('/api/v1/admin/sync', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+            }
+        });
+
+        if (response.ok) {
+            loadPortfolioData();
+        }
+    } catch (error) {
+        console.error('Error syncing prices:', error);
+    }
+}
+
+async function calculateRebalancing() {
+    try {
+        const response = await fetch('/api/v1/portfolio/rebalance', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            renderRebalancing(data.data);
+        }
+    } catch (error) {
+        console.error('Error calculating rebalancing:', error);
+    }
+}
+</script>
+{% endblock %}
